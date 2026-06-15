@@ -6,12 +6,13 @@ import { createRoot } from 'react-dom/client'
 // import { TrafficLightWithEffect } from './useEffect/TrafficLightWithEffect'
 // import { TrafficLightWithEffectHook } from './useEffect/TrafficLightWithEffectHook'
 // import { PokemonPage } from './Pokemon/PokemonPage'
-import { FocusScreen } from './useRef/FocusScreen'
+// import { FocusScreen } from './useRef/FocusScreen'
+import { TasksApp } from './useReducer/TasksApp'
 
 import './index.css'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <FocusScreen />
+    <TasksApp />
   </StrictMode>,
 )
