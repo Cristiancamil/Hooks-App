@@ -1,4 +1,4 @@
-import { useReducer, useState } from 'react';
+import { useEffect, useReducer, useState } from 'react';
 
 import { Plus, Trash2, Check } from 'lucide-react';
 
@@ -9,39 +9,104 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { getTaskInitialState, taskReducer } from './reducer/taskReducer';
 
 
+/**
+ * Aplicación principal de gestión de tareas.
+ *
+ * Responsabilidades:
+ * - Gestionar el estado temporal del formulario.
+ * - Gestionar el estado global de las tareas mediante useReducer.
+ * - Persistir las tareas en localStorage.
+ * - Mostrar estadísticas de progreso.
+ * - Renderizar la lista de tareas.
+ */
 export const TasksApp = () => {
 
+  // Estado para controlar el valor actual del campo de texto.
   const [inputValue, setInputValue] = useState('');
+
+  /**
+ * Estado global de las tareas.
+ *
+ * state:
+ * - Contiene la información completa
+ *   administrada por el reducer.
+ *
+ * dispatch:
+ * - Permite enviar acciones que modifican
+ *   el estado de forma controlada.
+ */
   const [state, dispatch] = useReducer(taskReducer, getTaskInitialState())
 
-  // Agregar tarea
+  /**
+ * Sincroniza el estado de las tareas
+ * con localStorage.
+ *
+ * Se ejecuta cada vez que el estado cambia.
+ *
+ * Objetivo:
+ * - Persistir la información.
+ * - Evitar perder las tareas al recargar
+ *   la página.
+ */
+  useEffect(() => {
+    localStorage.setItem('tasks-state', JSON.stringify(state))
+  }, [state]);
+
+
+  /**
+   * Agrega una nueva tarea.
+   *
+   * Flujo:
+   * 1. Verifica que exista texto.
+   * 2. Envía la acción al reducer.
+   * 3. Limpia el campo de entrada.
+   */
   const addTodo = () => {
     if (inputValue.length === 0) return
     dispatch({ type: 'ADD_TODO', payload: inputValue })
     setInputValue('')
   };
 
-  // Cambiar el estado de la tarea
+  /**
+   * Cambia el estado de una tarea.
+   *
+   * completed: true → false
+   * completed: false → true
+   *
+   * @param id Identificador de la tarea.
+   */
   const toggleTodo = (id: number) => {
     dispatch({ type: 'TOGGLE_TODO', payload: id })
   };
 
-  // Eliminar la tarea
+  /**
+   * Elimina una tarea existente.
+   *
+   * @param id Identificador de la tarea.
+   */
   const deleteTodo = (id: number) => {
     dispatch({ type: 'DELETE_TODO', payload: id })
   };
 
-  // Se agrega la tarea cuando se presiona la tecla Enter
+  /**
+   * Permite agregar tareas mediante
+   * la tecla Enter.
+   *
+   * Mejora la experiencia del usuario
+   * evitando depender exclusivamente
+   * del botón Agregar.
+   */
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if(e.key === 'Enter') {
       addTodo()
     }
   };
 
+  /**
+   * Extrae las propiedades más utilizadas
+   * para simplificar el JSX.
+   */
   const {todos, completed: completedCount, total: totalCount} = state
-
-  // const completedCount = todos.filter((todo) => todo.completed).length;
-  // const totalCount = todos.length;
 
   return (
     <div className="min-h-screen bg-linear-to-br from-slate-50 to-slate-100 p-4">

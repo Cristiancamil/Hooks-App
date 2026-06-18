@@ -1,3 +1,6 @@
+import * as z from "zod";
+
+
 /**
  * Representa una tarea dentro de la aplicación
  */
@@ -46,14 +49,60 @@ export type TaskAction =
 | {type: 'TOGGLE_TODO', payload: number}
 | {type: 'DELETE_TODO', payload: number}
 
-export const getTaskInitialState = () => {
-  return {
-    todos: [],
-    total: 0,
-    completed: 0,
-    pending: 0
+const todoSchema = z.object({
+  id: z.number(),
+  text: z.string(),
+  completed: z.boolean()
+}) 
+
+const taskStateSchema = z.object({
+  todos: z.array(todoSchema),
+  total: z.number(),
+  completed: z.number(),
+  pending: z.number()
+})
+
+
+
+
+
+
+
+export const getTaskInitialState = (): TaskState => {
+
+  // Accedemos al valor guardado en el localStorage por medio del item.
+  const localStorageState = localStorage.getItem('tasks-state')
+
+  // Si no hay nada guardado en el localStorage retornamos las propiedades
+  // del objeto vacío.
+  if(!localStorageState){
+    return {
+      todos: [],
+      total: 0,
+      completed: 0,
+      pending: 0
+    }
   }
+
+  // Validar mediante zood
+  const result = taskStateSchema.safeParse(JSON.parse(localStorageState))
+
+  if( result.error ) {
+    console.log(result.error)
+    return {
+      todos: [],
+      total: 0,
+      completed: 0,
+      pending: 0
+    }
+  }
+
+  // Si la validación falla retornamos el valor que está
+  // almacenado en el localStorage.
+  return result.data 
 }
+
+
 /**
  * Reducer encargado de gestionar el estado de las tareas.
  *
