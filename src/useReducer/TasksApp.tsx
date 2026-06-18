@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useReducer, useState } from 'react';
 
 import { Plus, Trash2, Check } from 'lucide-react';
 
@@ -6,39 +6,42 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { getTaskInitialState, taskReducer } from './reducer/taskReducer';
 
-interface Todo {
-  id: number;
-  text: string;
-  completed: boolean;
-}
 
 export const TasksApp = () => {
-  const [todos, setTodos] = useState<Todo[]>([]);
+
   const [inputValue, setInputValue] = useState('');
+  const [state, dispatch] = useReducer(taskReducer, getTaskInitialState())
 
+  // Agregar tarea
   const addTodo = () => {
-    console.log('Agregar tarea', inputValue);
-
+    if (inputValue.length === 0) return
+    dispatch({ type: 'ADD_TODO', payload: inputValue })
+    setInputValue('')
   };
 
+  // Cambiar el estado de la tarea
   const toggleTodo = (id: number) => {
-    console.log('Cambiar de true a false', id);
-
+    dispatch({ type: 'TOGGLE_TODO', payload: id })
   };
 
+  // Eliminar la tarea
   const deleteTodo = (id: number) => {
-    console.log('Eliminar tarea', id);
-
+    dispatch({ type: 'DELETE_TODO', payload: id })
   };
 
+  // Se agrega la tarea cuando se presiona la tecla Enter
   const handleKeyPress = (e: React.KeyboardEvent) => {
-    console.log('Presiono enter');
-
+    if(e.key === 'Enter') {
+      addTodo()
+    }
   };
 
-  const completedCount = todos.filter((todo) => todo.completed).length;
-  const totalCount = todos.length;
+  const {todos, completed: completedCount, total: totalCount} = state
+
+  // const completedCount = todos.filter((todo) => todo.completed).length;
+  // const totalCount = todos.length;
 
   return (
     <div className="min-h-screen bg-linear-to-br from-slate-50 to-slate-100 p-4">

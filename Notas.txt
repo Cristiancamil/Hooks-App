@@ -1,0 +1,46 @@
+INSTALACIÓN Y CONFIGURACIÓN DE SHADCN
+
+LINK librería: https://ui.shadcn.com/
+
+
+1. Editar el archivo tsconfig.json:
+
+  // Esta configuración se debe añadir debajo del arreglo references. 
+  "compilerOptions": {
+    "paths": {
+      "@/*": ["./src/*"]
+    }
+  }
+
+2. Editar el archivo tsconfig.app.json y añadirlo dentro de compilerOptions:
+
+  // Esta configuración se puede añadir al inicio del objeto compilerOptions 
+  "paths": {
+    "@/*": [
+      "./src/*"
+    ]
+  }
+
+3. Instalar las siguientes dependencias:
+
+  npm install -D @types/node
+
+4. Editar el archivo vite.config.ts
+
+  // La importación debe posicionarse en la primera línea
+  import path from "path"
+
+  // Este código se añade debajo del arreglo plugins.
+  resolve: {
+    alias: {
+      "@": path.resolve(__dirname, "./src"),
+    },
+  },
+
+5. Instalar shadcn:
+
+  npx shadcn@latest init
+
+6. Añadir componentes al proyecto:
+
+  npx shadcn@latest add
