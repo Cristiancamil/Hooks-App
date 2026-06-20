@@ -67,14 +67,32 @@ const taskStateSchema = z.object({
 
 
 
-
+/**
+ * Obtiene el estado inicial de la aplicación.
+ *
+ * Flujo:
+ * 1. Intenta recuperar el estado almacenado en localStorage.
+ * 2. Si no existe información, retorna un estado vacío.
+ * 3. Si existe información, la valida con Zod.
+ * 4. Si la validación falla, retorna un estado vacío.
+ * 5. Si la validación es correcta, retorna el estado recuperado.
+ *
+ * Esto permite:
+ * - Persistir tareas entre recargas de página.
+ * - Evitar errores causados por datos corruptos.
+ */
 export const getTaskInitialState = (): TaskState => {
 
-  // Accedemos al valor guardado en el localStorage por medio del item.
+    /**
+   * Recupera el estado almacenado previamente
+   * en el navegador.
+   */
   const localStorageState = localStorage.getItem('tasks-state')
 
-  // Si no hay nada guardado en el localStorage retornamos las propiedades
-  // del objeto vacío.
+  /**
+   * Si no existe información almacenada,
+   * inicializamos la aplicación con un estado vacío.
+   */
   if(!localStorageState){
     return {
       todos: [],
@@ -84,9 +102,25 @@ export const getTaskInitialState = (): TaskState => {
     }
   }
 
-  // Validar mediante zood
+  /**
+   * Valida la estructura de los datos recuperados.
+   *
+   * safeParse:
+   * - No lanza excepciones.
+   * - Retorna un objeto indicando si la validación
+   *   fue exitosa o no.
+   */
   const result = taskStateSchema.safeParse(JSON.parse(localStorageState))
 
+  /**
+   * Si la validación falla, ignoramos los datos
+   * almacenados y retornamos un estado limpio.
+   *
+   * Esto evita errores provocados por:
+   * - Datos corruptos.
+   * - Modificaciones manuales del localStorage.
+   * - Cambios futuros en la estructura del estado.
+   */
   if( result.error ) {
     console.log(result.error)
     return {
@@ -97,8 +131,12 @@ export const getTaskInitialState = (): TaskState => {
     }
   }
 
-  // Si la validación falla retornamos el valor que está
-  // almacenado en el localStorage.
+  /**
+   * Los datos son válidos.
+   *
+   * Retornamos el estado recuperado
+   * desde localStorage.
+   */
   return result.data 
 }
 
