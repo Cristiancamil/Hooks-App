@@ -53,7 +53,7 @@ export const ScrambleWords = () => {
   const [maxAllowErrors, setMaxAllowErrors] = useState(3);
 
   const [skipCounter, setSkipCounter] = useState(0);
-  const [maxSkips, setMaxSkips] = useState(3);
+  const [maxSkips, ] = useState(3);
 
   const [isGameOver, setIsGameOver] = useState(false);
 
@@ -118,9 +118,9 @@ export const ScrambleWords = () => {
   if (words.length === 0) {
     
     return (
-      <div className="min-h-screen bg-gradient-to-br from-purple-100 via-blue-50 to-indigo-100 flex items-center justify-center p-4">
+      <div className="min-h-screen bg-linear-to-br from-purple-100 via-blue-50 to-indigo-100 flex items-center justify-center p-4">
         <div className="w-full max-w-md mx-auto">
-          <h1 className="text-4xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent mb-2">
+          <h1 className="text-4xl font-bold bg-linear-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent mb-2">
             Palabras desordenadas
           </h1>
           <p className="text-gray-600">No hay palabras para jugar</p>
