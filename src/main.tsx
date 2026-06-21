@@ -13,13 +13,14 @@ import { Toaster } from "sonner";
 // import { ScrambleWords } from './useReducer/ScrambleWords'
 // import { MemoHook } from './memos/MemoHook'
 // import { MemoCounter } from "./memos/MemoCounter";
-import { InstagromApp } from "./useOptimistic/IntagromApp";
+// import { InstagromApp } from "./useOptimistic/IntagromApp";
+import { ProfesionalApp } from "./useContext/ProfesionalApp";
 
 import "./index.css";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <Toaster />
-    <InstagromApp />
+    <ProfesionalApp />
   </StrictMode>,
 );
