@@ -1,16 +1,22 @@
 
 /**
- * Estado gestionado por el reducer de palabrasRevueltas.
+ * Estado global gestionado por el reducer.
  *
- * Este objeto representa toda la información que el reducer
- * necesita para calcular el siguiente estado de la aplicación.
+ * Este objeto contiene toda la información necesaria
+ * para controlar una partida del juego de palabras.
  *
  * Propiedades:
- * - contadordeErrores: Conteo de número de errores.
- * - contadorDeSaltos: Conteo de número de saltos.
- * - erroresPermitidos: número de errores permitidos.
- * - palabras: Arreglo del juego de palbras.
- * - SaltosPermitidos: número de saltos permitidos.
+ * - currentWord: palabra correcta que debe adivinar el jugador.
+ * - errorCounter: cantidad de respuestas incorrectas.
+ * - guess: respuesta ingresada por el jugador.
+ * - isGameOver: indica si la partida ha finalizado.
+ * - maxAllowErrors: número máximo de errores permitidos.
+ * - maxSkips: número máximo de palabras que pueden saltarse.
+ * - points: puntuación acumulada.
+ * - scrambledWord: palabra mezclada que se muestra al usuario.
+ * - skipCounter: cantidad de palabras saltadas.
+ * - words: palabras restantes por jugar.
+ * - totalWords: cantidad total de palabras de la partida.
  */
 export interface ScrambleWordsStates {
   currentWord: string
@@ -26,7 +32,13 @@ export interface ScrambleWordsStates {
   totalWolrds: number
 }
 
-// Arreglo de palabras para adivinar
+/**
+ * Catálogo de palabras disponibles
+ * para una partida.
+ *
+ * Cada nueva partida utiliza estas palabras
+ * como base para generar el juego.
+ */
 const GAME_WORDS = [
   'REACT',
   'JAVASCRIPT',
@@ -47,12 +59,28 @@ const GAME_WORDS = [
   'TAILWIND',
 ]
 
-// Esta función mezcla el arreglo para que siempre sea aleatorio
+/**
+ * Mezcla aleatoriamente un arreglo.
+ *
+ * Nota:
+ * Este enfoque es suficiente para juegos simples,
+ * aunque no genera una distribución completamente
+ * uniforme de los elementos.
+ */
 const suffleArray = (array: string[]) => {
   return array.sort(() => Math.random() - 0.5);
 }
 
-// Esta función mezcla las letras de la palabra
+/**
+ * Mezcla aleatoriamente las letras
+ * de una palabra.
+ *
+ * Ejemplo:
+ *
+ * REACT
+ * ↓
+ * TACER
+ */
 const scrambleWord = (word: string = '') => {
   return word
     .split('')
@@ -61,11 +89,17 @@ const scrambleWord = (word: string = '') => {
 }
 
 /**
- * Obtiene el estado inicial de la aplicación.
- * 
+ * Genera el estado inicial de una nueva partida.
+ *
  * Flujo:
- * 1. Genera un nuevo arreglo aleatorio del arreglo de JUEGOS_DE_PALBRAS
- * 2. Retorna el estado.
+ * 1. Mezcla aleatoriamente el catálogo de palabras.
+ * 2. Selecciona la primera palabra.
+ * 3. Genera su versión desordenada.
+ * 4. Inicializa las estadísticas del juego.
+ *
+ * Esta función se utiliza cuando:
+ * - Se carga la aplicación.
+ * - Se inicia una nueva partida.
  */
 export const getInitialState = (): ScrambleWordsStates => {
   const suffleWords = suffleArray([...GAME_WORDS])
@@ -85,17 +119,42 @@ export const getInitialState = (): ScrambleWordsStates => {
 }
 
 /**
- * Acciones que pueden modificar los estados
-*/
+ * Acciones soportadas por el reducer.
+ *
+ * SET_GUESS:
+ * - Actualiza la respuesta ingresada por el usuario.
+ *
+ * CHECK_ANSWER:
+ * - Verifica si la respuesta es correcta.
+ *
+ * SKIP_WORD:
+ * - Salta la palabra actual.
+ *
+ * START_NEW_GAME:
+ * - Reinicia completamente la partida.
+ */
 export type scrambleWordsActions = 
 | {type: 'SET_GUESS', payload: string}
 | {type: 'CHECK_ANSWER'}
 | {type: 'SKIP_WORD'}
 | {type: 'START_NEW_GAME', payload: ScrambleWordsStates}
 
+
 /**
  * Reducer encargado de gestionar
- * 
+ * toda la lógica del juego.
+ *
+ * Responsabilidades:
+ * - Actualizar respuestas.
+ * - Validar palabras.
+ * - Asignar puntos.
+ * - Controlar errores.
+ * - Controlar saltos.
+ * - Reiniciar partidas.
+ *
+ * Regla importante:
+ * Nunca modifica el estado original.
+ * Siempre retorna un nuevo estado.
  */
 export const scrambleWordsReducer = ( 
   state: ScrambleWordsStates,
@@ -103,12 +162,30 @@ export const scrambleWordsReducer = (
 ): ScrambleWordsStates => {
 
   switch(action.type) {
+
+    /**
+     * Actualiza la respuesta actual.
+     *
+     * Se normaliza el texto para evitar
+     * problemas de comparación.
+     */
     case 'SET_GUESS':
       return {
         ...state,
         guess: action.payload.trim().toUpperCase()
       }
 
+      /**
+       * Valida la respuesta ingresada.
+       *
+       * Si la respuesta es correcta:
+       * - Incrementa la puntuación.
+       * - Avanza a la siguiente palabra.
+       *
+       * Si la respuesta es incorrecta:
+       * - Incrementa el contador de errores.
+       * - Verifica si el juego terminó.
+       */
     case 'CHECK_ANSWER':{
       if(state.currentWord === state.guess) {
         const newWords = state.words.slice(1)
@@ -146,6 +223,12 @@ export const scrambleWordsReducer = (
       }
     }
 
+    /**
+     * Reinicia completamente la partida.
+     *
+     * El nuevo estado es generado
+     * mediante getInitialState().
+     */
     case 'START_NEW_GAME': 
       return action.payload
     
